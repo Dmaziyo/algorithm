@@ -9,16 +9,33 @@
     //该函数能够将对象的所有key或者字符串转换都转换成camelCase
     function underscore2Camel(target){
         if(target instanceof Array){
-            for(let el of target){
-                underscore2Camel(el);
+            for(let idx in target){
+                if(typeof target[idx] ==='object'){
+                    underscore2Camel(target[idx]);
+                }
+                else if(typeof target[idx] ==='string'){
+                    target[idx] = underscore2Camel(target[idx]);
+                }
+            }
+        }
+        else if(typeof target ==='object'){
+            for(let key in target){
+                if(typeof target[key] ==='object'){
+                    underscore2Camel(target[key])
+                }
+                else{
+                    let newKey = format2Hump(key);
+                    if(newKey!==key){
+                        target[newKey]=target[key];
+                        delete target[key];
+                    }
+                }
             }
         }
         else if(typeof target ==='string'){
-
+            return format2Hump(target);
         }
-        else if(typeof target ==='string')
     }
-
 
     function format2Hump(str){
         const regExp = /\_(\w)/g
