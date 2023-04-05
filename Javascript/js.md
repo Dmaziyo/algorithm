@@ -2,6 +2,11 @@
 
 - [1. 手写下划线转驼峰命名。](#1-手写下划线转驼峰命名考虑对象的深度递归情况)
 - [2. 手写 Promise](#2-手写整个-promise-类要求实现-then-方法和-catch-捕获异常)
+- [3. 实现数据类型检测(包括对象)](#3-实现数据类型检测包括对象)
+- [4. ES5 实现继承](#4-es5实现继承)
+- [5. null 和 undefined 区别](#5-null-和-undefined-区别)
+- [6. 虚拟列表](#6-虚拟列表)
+- [7. 多维数组展开](#7-多维数组展开)
 
 #### 1. 手写下划线转驼峰命名(考虑对象的深度递归情况)
 
@@ -163,4 +168,200 @@ promise
   .then(result => {
     console.log(result)
   })
+```
+
+#### 3. 实现数据类型检测(包括对象)
+
+```js
+function getType(data) {
+  if (typeof data === 'object') {
+    return Object.prototype.toString.call(data).slice(8, -1)
+  } else {
+    return typeof data
+  }
+}
+```
+
+#### 4. es5 实现继承
+
+```js
+// 该方法为寄生式组合继承
+function Person(name, age) {
+  this.name = name
+  this.age = age
+}
+Person.prototype.sayName = function () {
+  debugger
+  console.log(this.name)
+}
+
+function Student(name, age, grade) {
+  Person.call(this, name, age)
+  this.grade = grade
+}
+Student.prototype = Object.create(Person.prototype)
+Student.prototype.constructor = Student
+let student = new Student('小明', '16', '六年级')
+student.sayName()
+```
+
+#### 5. null 和 undefined 区别
+
+```js
+null的含义是空对象, 用于初始化
+undefined表示变量声明了但是未赋值
+```
+
+#### 6. 虚拟列表
+
+[「前端进阶」高性能渲染十万条数据(虚拟列表)](https://juejin.cn/post/6844903982742110216)
+
+```js
+什么是虚拟列表?
+  - 是一种懒加载方式,只对可见区域进行渲染,对不可见区域则进行部分渲染或者不渲染
+为什么要使用虚拟列表?
+  - 当有大量数据需要被浏览器渲染加载时,采用该方式,可以减少渲染时间,即用户等待时间,提高用户体验
+实现方法:
+ 所需数据:
+  - listData:所有数据
+  - scrollTop:滚动距离
+  - listHeight: listData.length * itemSize   列表总高度(用于支撑滚动)
+  - visibleCount:Math.ceil(screenHeight/itemSize) 可显示个数
+  - visibleData:listData.slice(Math.floor(scrollTop/itemSize),visibleCount+ Math.floor(scrollTop/itemSize)) 可显示数据
+  - startOffset:scrollTop - (scrollTop % itemSize),类似于Math.floor(scrollTop/itemSize)*itemSize
+  - screenHeight:可视区域高度              -itemSize:列表每项的长度
+
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+    <style>
+      html,
+      body {
+        height: 100%;
+        overflow: hidden;
+      }
+      #app {
+        height: 100%;
+      }
+      .infinite-list-container {
+        height: 100%;
+        overflow: auto;
+        position: relative;
+        -webkit-overflow-scrolling: touch;
+      }
+
+      .infinite-list {
+        /* 使得元素一开始处于最顶端 */
+        top: 0px;
+        left: 0px;
+        right: 0px;
+        text-align: center;
+        position: absolute;
+      }
+
+      .infinite-list-phantom {
+        position: absolute;
+        width: 100%;
+      }
+      .infinite-list-item {
+        backgroundcolor: 'pink';
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 0 auto;
+        border: 1px solid;
+      }
+    </style>
+  </head>
+  <script src="https://cdn.jsdelivr.net/npm/vue@2/dist/vue.js"></script>
+
+  <body>
+    <div id="app">
+      <div ref="container" class="infinite-list-container" @scroll="scrollEvent">
+        <div class="infinite-list-phantom" :style="{height:listHeight}"></div>
+        <div class="infinite-list" :style="{transform:transformOffSet}">
+          <div class="infinite-list-item" v-for="item in visibleData" :style="{height:`${itemSize}px`}">
+            {{item.value}}
+          </div>
+        </div>
+      </div>
+    </div>
+    <script>
+      let vm = new Vue({
+        el: '#app',
+        data() {
+          return {
+            listData: [],
+            visibleData: [],
+            itemSize: 200,
+            startOffSet: 0,
+            screenHeight: null
+          }
+        },
+        methods: {
+          // change the showing data
+          scrollEvent(e) {
+            let scrollTop = this.$refs.container.scrollTop
+            let numberOfItem = Math.floor(scrollTop / this.itemSize)
+            this.visibleData = this.listData.slice(numberOfItem, numberOfItem + this.visibleCount)
+            this.startOffSet = numberOfItem*this.itemSize
+          }
+        },
+        computed: {
+          //用于支撑滚动的高度
+          listHeight() {
+            return `${this.listData.length * this.itemSize}px`
+          },
+          //用于实现滚动效果
+          transformOffSet() {
+            return `translate(0,${this.startOffSet}px)`
+          },
+          // 可显示个数
+          visibleCount() {
+            return Math.ceil(this.screenHeight / this.itemSize)
+          }
+        },
+        mounted() {
+          // initialize the arr
+          let arr = []
+          for (let i = 0; i < 1000; i++) {
+            arr.push({
+              value: i
+            })
+          }
+          this.listData = arr
+          this.screenHeight = window.screen.height
+          debugger
+          this.visibleData = this.listData.slice(0, this.visibleCount)
+        }
+      })
+    </script>
+  </body>
+</html>
+
+```
+
+#### 7. 多维数组展开
+
+[JS：展开多维数组的 10 种方法（可控制深度）](https://www.jianshu.com/p/2c1544ac160b)
+
+```js
+// ES2019 新增 Array.prototype.flat(), 使用Array.prototype.flat()
+let arr = [1, [2, 3, [4, 5, [6, 7, 8, [9, 10]]]]]
+console.log(arr.flat()) //默认只展开一层  [1, 2, 3, [4, 5, [6, 7, 8, [9, 10]]]]
+console.log(arr.flat(Infinity)) // [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
+// 使用for循环进行递归
+let arr = [1, [2, 3, [4, 5, [6, 7, 8, [9, 10]]]]]
+
+function flatByFor(arr, depth) {
+  const res = []
+  for (let item of arr) {
+    Array.isArray(item) && depth > 0 ? res.push(...flatByFor(item, depth - 1)) : res.push(item)
+  }
+  return res
+}
+console.log(flatByFor(arr, 1))
 ```
