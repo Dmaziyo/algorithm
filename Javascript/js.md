@@ -7,6 +7,7 @@
 - [5. null 和 undefined 区别](#5-null-和-undefined-区别)
 - [6. 虚拟列表](#6-虚拟列表)
 - [7. 多维数组展开](#7-多维数组展开)
+- [8.如何实现深克隆和浅克隆](#8-如何实现深克隆和浅克隆)
 
 #### 1. 手写下划线转驼峰命名(考虑对象的深度递归情况)
 
@@ -364,4 +365,48 @@ function flatByFor(arr, depth) {
   return res
 }
 console.log(flatByFor(arr, 1))
+```
+
+#### 8. 如何实现深克隆和浅克隆
+
+[如何写出一个惊艳面试官的深拷贝?](https://juejin.cn/post/6844903929705136141)
+
+```js
+浅克隆: 创建一个对象的副本, 副本的值都是直接拷贝来的, 值是原始类型就是拷贝原始类型, 是引用类型就直接拷贝引用地址
+深克隆: 创建一个完全独立的对象的副本, 但是对于副本的值操作不会影响origin对象
+//方法1
+// 缺点:只能处理类似json格式的对象
+JSON.parse(JSON.stringify())
+// 方法2
+function clone(target, map = new WeakMap()) {
+  // weakMap在对象赋值为null时,不会强制绑定target在map(target,clone)中,会让垃圾回收机制自动清理target
+  if (typeof target === 'object') {
+    // 判断是数组还是对象
+    let targetClone = Array.isArray(target) ? [] : {}
+    // 处理循环引用
+    if (map.get(target)) {
+      return map.get(target)
+    }
+    map.set(target, targetClone)
+    for (let key in target) {
+      // 深层遍历
+      targetClone[key] = typeof target[key] === 'object' ? clone(target[key], map) : target[key]
+    }
+    return targetClone
+  } else {
+    return target
+  }
+}
+let target = {
+  prop1: 'prop1',
+  prop2: 'prop2',
+  fnProp: function () {
+    console.log('abc')
+  }
+}
+target.fnProp()
+target.self = target
+let target1 = clone(target)
+console.log(target.self === target1.self)
+target1.fnProp()
 ```
