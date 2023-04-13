@@ -5,6 +5,7 @@
 - [3. 常见的选择器有哪些?](#3-常见的选择器有哪些)
 - [4. 介绍一下标准的 CSS 的盒子模型？低版本 IE 的盒子模型有什么不同的?](#4-介绍一下标准的-css-的盒子模型低版本-ie-的盒子模型有什么不同的)
 - [5. link 和@import 区别?](#5-link-和import-区别)
+- [6. position 有哪些属性](#6-position-有哪些属性)
 
 #### 1. display:none 和 visibility:hidden 的区别
 
@@ -62,4 +63,16 @@ IE盒模型: width和height包含content, padding, border
 1.link是html提供的标签, 可以引入外部资源文件, @import只能导入css文件
 2.link引入的资源会在页面渲染之前加载处理,而@import是在页面渲染完后再处理
 3.可以通过js操作添加link标签来引入css资源,而@import不可以,因为只存在于css文件中,DOM方法无法操作CSS文件
+```
+
+#### 6. position 有哪些属性
+
+[[MDN position]](https://developer.mozilla.org/en-US/docs/Web/CSS/position)
+
+```js
+- static:元素遵循正常的文本流布局
+- relative:元素在layout中的位置仍然是static的位置,但是可以基于自身进行偏移展示
+- absolute:元素脱离正常文本流,相对于最近的positioned的元素进行偏移布局展示
+- fixed:脱离正常文本流,相对于视图进行偏移布局展示
+- sticky:...(先pass)
 ```

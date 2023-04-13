@@ -8,6 +8,8 @@
 - [6. 虚拟列表](#6-虚拟列表)
 - [7. 多维数组展开](#7-多维数组展开)
 - [8.如何实现深克隆和浅克隆](#8-如何实现深克隆和浅克隆)
+- [9.讲讲什么是原型链](#9-讲讲什么是原型链)
+- [10.手写 new 操作符](#10-手写-new-操作符)
 
 #### 1. 手写下划线转驼峰命名(考虑对象的深度递归情况)
 
@@ -409,4 +411,34 @@ target.self = target
 let target1 = clone(target)
 console.log(target.self === target1.self)
 target1.fnProp()
+```
+
+#### 9. 讲讲什么是原型链
+
+```js
+每个构造函数都有个属性prototype, 指向一个对象, 该对象为所有由构造函数产生的实例共享
+每一个对象实例都会有一个属性__proto__
+该属性指向对象的原型.当在一个对象中访问属性时.如果访问不到.则会通过__proto__去原型对象上去查询.而原型对象又有__proto__
+直至查询到该属性或者直到原型链的尽头Object.prototype才结束
+// 获取原型的方法
+Object.getPrototypeOf()
+```
+
+#### 10. 手写 new 操作符
+
+```js
+function newSimulator() {
+  let args = Array.from(arguments)
+  let constructor = args.shift()
+  let obj = Object.create(constructor.prototype)
+  let result = constructor.apply(obj, args)
+  if (typeof result === 'object') return result
+  else return obj
+}
+function Person(age, name) {
+  this.age = age
+  this.name = name
+}
+let person = newSimulator(Person, '13', 'Leon')
+console.log(person)
 ```
