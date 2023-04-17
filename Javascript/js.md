@@ -10,6 +10,9 @@
 - [8.如何实现深克隆和浅克隆](#8-如何实现深克隆和浅克隆)
 - [9.讲讲什么是原型链](#9-讲讲什么是原型链)
 - [10.手写 new 操作符](#10-手写-new-操作符)
+- [11.以数组的形式获取所有标签,且不重复](#11-以数组的形式获取所有标签且不重复)
+- [12.扩展运算符](#12-扩展运算符)
+- [13.实现 promise.all，promise.race，promise.any，promise.allSettled](#13-实现-promiseallpromiseracepromiseanypromiseallsettled)
 
 #### 1. 手写下划线转驼峰命名(考虑对象的深度递归情况)
 
@@ -441,4 +444,84 @@ function Person(age, name) {
 }
 let person = newSimulator(Person, '13', 'Leon')
 console.log(person)
+```
+
+#### 11. 以数组的形式获取所有标签,且不重复
+
+```js
+// 获取到所有的元素,然后用set过滤,最终使用扩展运算符解析成数组
+let tagNames = Array.from(document.querySelectorAll('*')).map(item => item.tagName)
+let uniqueNames = [...new Set(tagNames)]
+console.log(uniqueNames)
+```
+
+#### 12. 扩展运算符
+
+```js
+// 扩展运算符会将可迭代的,例如数组,string 在函数传参中或数组定义中扩展出预期的位置,并按需填充
+function sum(x, y, z) {
+  return x + y + z
+}
+
+const numbers = [1, 2, 3, 4]
+// 因为预期是x,y,z 所以只会扩展三个
+console.log(sum(...numbers))
+// Expected output: 6
+
+// 在对象定义中,会枚举所有对象的值,并且以键值对的形式添加至正在被创建的对象中
+let obj1 = {
+  a: '1',
+  b: '2'
+}
+let obj2 = {
+  c: '3',
+  ...obj1 //枚举所有的值并以键值对的形式添加进去
+}
+console.log(obj2)
+// 在函数参数定义中为剩余语法,会将参数整合为一个数组的形式
+var obj1 = { foo: 'bar', x: 42 }
+var obj2 = { foo: 'baz', y: 13 }
+const merge = (...objects) => ({ ...objects })
+```
+
+#### 13. 实现 promise.all，promise.race，promise.any，promise.allSettled
+
+[字节飞书面试——请实现 promise.all](https://juejin.cn/post/7069805387490263047#heading-1)
+
+```js
+// promise.all
+作用: 将多个异步请求传来的数据按照指定顺序进行处理
+功能特点:
+      -接收可遍历的promise[数组]，
+      -返回一个promise
+      -如果所有promises运行成功,将所有的成功结果按照顺序作为数组传给resolve
+      -promises中只要有一个失败,就会立刻返回reject,返回第一个reject传的值
+// 具体实现
+Promise.MyAll = function (arguments) {
+  let arr = []
+  let cnt = 0;
+  return new Promise((resolve, reject) => {
+    arguments.forEach((item, index) => {
+      Promise.resolve(item).then(result => {
+        arr[index] = result;
+        cnt++;
+        if (cnt === arguments.length) resolve(arr);
+      }, reject)
+    })
+  })
+}
+// promise.race
+功能特点:返回promises中最快响应的值
+Promise.MyRace = function(arguments){
+  return new Promise((resolve,reject)=>{
+    arguments.forEach((promise)=>{
+      Promise.resolve(promise).then(resolve,reject)
+    })
+  })
+}
+// promise.any
+功能特点:与all相反,只要有一个成功就返回,而当所有promises都报错时,返回所有报错集合
+
+
+// Promise.allSettled ,将所有的promise的结果就集合在一起返回,即将reject和resolve的结果混合在一起
 ```
