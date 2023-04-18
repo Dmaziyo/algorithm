@@ -20,7 +20,7 @@
 ```js
     1.浏览器首先解析url,确定服务器和资源路径,生成发送给服务器的请求报文
     2.通过DNS查询服务器域名对应的真实ip地址
-    3.应用通过调用socket库,利用TCP/IP协议栈将数据包发送至服务器
+    3.与服务器建立TCP连接,利用TCP/IP协议栈将数据包发送至服务器
     4.服务器接收到请求报文后,将响应报文发送至客户端
     5.浏览器将响应报文进行解析,将HTML生成DOM tree,CSS 解析成 css rule tree,用于将样式匹配到对应元素上去
     6.DOM tree 和 CSS rule tree 会组合在一起形成render tree,里面只包含了要显示的元素,而display:none这样的不会出现在render tree中
