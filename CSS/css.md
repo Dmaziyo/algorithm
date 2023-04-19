@@ -6,6 +6,7 @@
 - [4. 介绍一下标准的 CSS 的盒子模型？低版本 IE 的盒子模型有什么不同的?](#4-介绍一下标准的-css-的盒子模型低版本-ie-的盒子模型有什么不同的)
 - [5. link 和@import 区别?](#5-link-和import-区别)
 - [6. position 有哪些属性](#6-position-有哪些属性)
+- [7. 垂直居中的方法有哪些](#7-垂直居中的方法有哪些)
 
 #### 1. display:none 和 visibility:hidden 的区别
 
@@ -75,4 +76,31 @@ IE盒模型: width和height包含content, padding, border
 - absolute:元素脱离正常文本流,相对于最近的positioned的元素进行偏移布局展示
 - fixed:脱离正常文本流,相对于视图进行偏移布局展示
 - sticky:...(先pass)
+```
+
+#### 7. 垂直居中的方法有哪些
+
+```js
+// 方法一
+.className{
+    position:absolute;
+    top:50%;
+    left:50%;
+    transform:translate(-50%,-50%)
+}
+// 方法二
+.className{
+    position:absolute;
+    top:0px;
+    bottom:0px;
+    left:0px;
+    right:0px;
+    margin:auto
+}
+// 方法三
+.className{
+    display:flex;
+    justify-content:center;
+    align-items:center
+}
 ```
