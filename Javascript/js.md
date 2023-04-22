@@ -13,6 +13,7 @@
 - [11.以数组的形式获取所有标签,且不重复](#11-以数组的形式获取所有标签且不重复)
 - [12.扩展运算符](#12-扩展运算符)
 - [13.实现 promise.all，promise.race，promise.any，promise.allSettled](#13-实现-promiseallpromiseracepromiseanypromiseallsettled)
+- [14.proto 和 prototype 的区别](#14-proto-和-prototype-的区别)
 
 #### 1. 手写下划线转驼峰命名(考虑对象的深度递归情况)
 
@@ -524,4 +525,33 @@ Promise.MyRace = function(arguments){
 
 
 // Promise.allSettled ,将所有的promise的结果就集合在一起返回,即将reject和resolve的结果混合在一起
+```
+
+#### 14.proto 和 prototype 的区别
+
+[彻底搞懂 Function，Object，proto，prototype 之间的关系](https://juejin.cn/post/6844903930216841230)
+
+```js
+ * 除原始数据类型外，js一切皆为对象
+ * 对象都有属性__proto__
+ * 函数还具有属性prototype
+ * 每个函数对象生成时，会同时创建一个Object实例，prototype指向该实例
+ * __proto__指向的是构造函数的prototype
+ * 函数对象的__proto__指向Function的prototype
+ Function.__proto__ === Function.prototype //因为Function本身也是函数，所以__proto__指向构造函数的prototype
+ * Object也是个函数，所以Object.__proto__ === Function.prototype
+ * Object.prototype是根节点
+// instanceOf原理就是判断该构造函数的prototype是否在对象的原型链中
+  instanceOf(leftVal,rightVal){
+    let leftProto = leftVal.__proto__
+    let rightPrototype = rightVal.prototype
+    while(true){
+      if(leftProto===null)return false
+
+      else if(leftProto===rightPrototype){
+          return true
+      }
+      leftProto = leftProto.__proto__
+    }
+  }
 ```
