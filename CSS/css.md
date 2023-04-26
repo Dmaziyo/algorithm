@@ -1,12 +1,13 @@
 ### 目录
 
-- [1. display:none 和 visibility:hidden 的区别](#1-display:none-和-visibility:hidden-的区别)
-- [2. 什么是 scoped?](#2-什么是-scoped)
+- [1. display:none 和 visibility:hidden 的区别](#1-display:none-和编译过程中，语法分析器的任务不包括（）
+
 - [3. 常见的选择器有哪些?](#3-常见的选择器有哪些)
 - [4. 介绍一下标准的 CSS 的盒子模型？低版本 IE 的盒子模型有什么不同的?](#4-介绍一下标准的-css-的盒子模型低版本-ie-的盒子模型有什么不同的)
 - [5. link 和@import 区别?](#5-link-和import-区别)
 - [6. position 有哪些属性](#6-position-有哪些属性)
 - [7. 垂直居中的方法有哪些](#7-垂直居中的方法有哪些)
+- [8. 实现两栏布局和三栏布局](#8-实现两栏布局和三栏布局)
 
 #### 1. display:none 和 visibility:hidden 的区别
 
@@ -102,5 +103,84 @@ IE盒模型: width和height包含content, padding, border
     display:flex;
     justify-content:center;
     align-items:center
+}
+```
+
+#### 8. 实现两栏布局和三栏布局
+
+```js
+// 双栏布局：左边一个定宽栏，右边则是自适应的栏
+<body>
+    <div class="box">
+        <div class="left">左边</div>
+        <div class="right">右边</div>
+    </div>
+    内容内容内容
+</body>
+
+// 方法1:因为浮动元素是固定的且不在正常文本流，而同级的元素虽然还在文本流，但是显示的时候会避开浮动元素
+.left {
+    float: left;
+    width: 200px;
+    background-color: gray;
+    height: 400px;
+
+}
+.right {
+    margin-left: 210px;
+    background-color: lightgray;
+    height: 200px;
+}
+.box{
+  // 使用BFC(Block Formatting Context)会将浮动元素也考虑在内
+  overflow: hidden;
+}
+// 方法2:利用flex布局
+.left {
+    float: left;
+    width: 200px;
+    background-color: gray;
+    height: 400px;
+
+}
+.right {
+    flex: 1;
+    background-color: lightgray;
+}
+.box{
+  display: flex;
+  align-items: flex-start //该功能可以使得item的高度自适应
+}
+// 三栏布局:两边固定,中间自适应
+<div class="wrap">
+    <div class="left">左侧</div>
+    <div class="middle">中间</div>
+    <div class="right">右侧</div>
+</div>
+// 方法1:使用flex实现
+.wrap{
+    display:flex;
+    justify-content:space-between;
+}
+.left,.right{
+    width:100px;
+    height:100px;
+    background-color:pink;
+}
+.middle{
+    width: 100%;
+    background-color:yellow;
+}
+// 方法2:使用grid实现
+.wrap{
+    display:grid;
+    grid-template-columns:100px 1fr 100px //fr表示占据剩余空间的比例
+}
+.left,.right{
+    height:100px;
+    background-color:pink;
+}
+.middle{
+    background-color:yellow;
 }
 ```

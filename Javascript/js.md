@@ -14,6 +14,7 @@
 - [12.扩展运算符](#12-扩展运算符)
 - [13.实现 promise.all，promise.race，promise.any，promise.allSettled](#13-实现-promiseallpromiseracepromiseanypromiseallsettled)
 - [14.proto 和 prototype 的区别](#14-proto-和-prototype-的区别)
+- [15.箭头函数的特点](#15-箭头函数的特点)
 
 #### 1. 手写下划线转驼峰命名(考虑对象的深度递归情况)
 
@@ -527,7 +528,7 @@ Promise.MyRace = function(arguments){
 // Promise.allSettled ,将所有的promise的结果就集合在一起返回,即将reject和resolve的结果混合在一起
 ```
 
-#### 14.proto 和 prototype 的区别
+#### 14. proto 和 prototype 的区别
 
 [彻底搞懂 Function，Object，proto，prototype 之间的关系](https://juejin.cn/post/6844903930216841230)
 
@@ -554,4 +555,15 @@ Promise.MyRace = function(arguments){
       leftProto = leftProto.__proto__
     }
   }
+```
+
+#### 15. 箭头函数的特点
+
+[ES6 系列之箭头函数](https://juejin.cn/post/6844903616231260174#heading-2)
+
+```js
+1. 参数不能使用arguments来访问
+2. 函数this是通过作用域链的this来确定的
+3. 无法使用new关键词调用
+4. 箭头函数没有prototype
 ```
