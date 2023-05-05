@@ -15,6 +15,8 @@
 - [13.实现 promise.all，promise.race，promise.any，promise.allSettled](#13-实现-promiseallpromiseracepromiseanypromiseallsettled)
 - [14.proto 和 prototype 的区别](#14-proto-和-prototype-的区别)
 - [15.箭头函数的特点](#15-箭头函数的特点)
+- [16.手写 bind call apply 函数](#16-手写-bind-call-apply-函数)
+- [17.不使用 json.stringify 实现去重数组对象](#17-不使用-jsonstringify-实现去重数组对象)
 
 #### 1. 手写下划线转驼峰命名(考虑对象的深度递归情况)
 
@@ -566,4 +568,77 @@ Promise.MyRace = function(arguments){
 2. 函数this是通过作用域链的this来确定的
 3. 无法使用new关键词调用
 4. 箭头函数没有prototype
+```
+
+#### 16. 手写 bind call apply 函数
+
+[手撕 call、apply、bind](https://juejin.cn/post/7128233572380442660)
+
+```js
+// 核心是将调用函数借用给target对象
+Function.prototype.myCall = function (target, ...args) {
+  let symbolKey = Symbol()
+  target[symbolKey] = this
+  target[symbolKey](...args)
+  delete target[symbolKey]
+}
+Function.prototype.apply = function (target, args) {
+  let symbolKey = Symbol()
+  target[symbolKey] = this
+  target[symbolKey](...args)
+  delete target[symbolKey]
+}
+
+Function.prototype.bind = function (target, ...args) {
+  let symbolKey = Symbol()
+  target[symbolKey] = this
+  return function () {
+    target[symbolKey](...args)
+  }
+}
+```
+
+#### 17. 不使用 json.stringify 实现去重数组对象
+
+```js
+// 类似于普通去重，建立一个新的数组，存放唯一值，用两层for循环将对象之间进行比较
+const arr = [{ a: 2 }, { a: 2 }, { a: 2, b: 1 }, { a: { b: 1, c: { a: 1 } } }, { a: { b: 1, c: { a: 1 } } }]
+/**
+ * obj1: new
+ * obj2: old
+ */
+function diff(obj1: Object, obj2: Object): boolean {
+  debugger
+  let keys1 = Object.keys(obj1).sort()
+  let keys2 = Object.keys(obj2).sort()
+  if (keys1.join() === keys2.join()) {
+    for (let key of keys1) {
+      let val1 = obj1[key]
+      let val2 = obj2[key]
+      if (val1 !== val2) {
+        if (typeof val1 === 'object' && typeof val2 === 'object') {
+          if (!diff(val1, val2)) return false
+        } else {
+          return false
+        }
+      }
+    }
+    return true
+  } else {
+    return false
+  }
+}
+let result = [arr[0]]
+for (let i = 1; i < arr.length; i++) {
+  let flag = true
+  for (let j = 0; j < result.length; j++) {
+    if (diff(arr[i], result[j])) {
+      // 相同则不添加至result
+      flag = false
+      break
+    }
+  }
+  if (flag) result.push(arr[i])
+}
+console.log(result)
 ```
