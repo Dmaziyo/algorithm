@@ -1,22 +1,26 @@
 ### 目录
 
-- [1. 手写下划线转驼峰命名。](#1-手写下划线转驼峰命名考虑对象的深度递归情况)
-- [2. 手写 Promise](#2-手写整个-promise-类要求实现-then-方法和-catch-捕获异常)
-- [3. 实现数据类型检测(包括对象)](#3-实现数据类型检测包括对象)
-- [4. ES5 实现继承](#4-es5实现继承)
-- [5. null 和 undefined 区别](#5-null-和-undefined-区别)
-- [6. 虚拟列表](#6-虚拟列表)
-- [7. 多维数组展开](#7-多维数组展开)
-- [8.如何实现深克隆和浅克隆](#8-如何实现深克隆和浅克隆)
-- [9.讲讲什么是原型链](#9-讲讲什么是原型链)
-- [10.手写 new 操作符](#10-手写-new-操作符)
-- [11.以数组的形式获取所有标签,且不重复](#11-以数组的形式获取所有标签且不重复)
-- [12.扩展运算符](#12-扩展运算符)
-- [13.实现 promise.all，promise.race，promise.any，promise.allSettled](#13-实现-promiseallpromiseracepromiseanypromiseallsettled)
-- [14.proto 和 prototype 的区别](#14-proto-和-prototype-的区别)
-- [15.箭头函数的特点](#15-箭头函数的特点)
-- [16.手写 bind call apply 函数](#16-手写-bind-call-apply-函数)
-- [17.不使用 json.stringify 实现去重数组对象](#17-不使用-jsonstringify-实现去重数组对象)
+- [目录](#目录)
+  - [1. 手写下划线转驼峰命名(考虑对象的深度递归情况)](#1-手写下划线转驼峰命名考虑对象的深度递归情况)
+  - [2. 手写整个 Promise 类要求实现 then 方法和 catch 捕获异常](#2-手写整个-promise-类要求实现-then-方法和-catch-捕获异常)
+  - [3. 实现数据类型检测(包括对象)](#3-实现数据类型检测包括对象)
+  - [4. es5 实现继承](#4-es5-实现继承)
+  - [5. null 和 undefined 区别](#5-null-和-undefined-区别)
+  - [6. 虚拟列表](#6-虚拟列表)
+  - [7. 多维数组展开](#7-多维数组展开)
+  - [8. 如何实现深克隆和浅克隆](#8-如何实现深克隆和浅克隆)
+  - [9. 讲讲什么是原型链](#9-讲讲什么是原型链)
+  - [10. 手写 new 操作符](#10-手写-new-操作符)
+  - [11. 以数组的形式获取所有标签,且不重复](#11-以数组的形式获取所有标签且不重复)
+  - [12. 扩展运算符](#12-扩展运算符)
+  - [13. 实现 promise.all，promise.race，promise.any，promise.allSettled](#13-实现-promiseallpromiseracepromiseanypromiseallsettled)
+  - [14. proto 和 prototype 的区别](#14-proto-和-prototype-的区别)
+  - [15. 箭头函数的特点](#15-箭头函数的特点)
+  - [16. 手写 bind call apply 函数](#16-手写-bind-call-apply-函数)
+  - [17. 不使用 json.stringify 实现去重数组对象](#17-不使用-jsonstringify-实现去重数组对象)
+  - [18. Array 构造函数只有一个参数值时的表现？](#18-array-构造函数只有一个参数值时的表现)
+  - [19. ParseInt()和Number的区别](#19-parseint和number的区别)
+  - [20. js脚本延迟加载的方式有哪些?](#20-js脚本延迟加载的方式有哪些)
 
 #### 1. 手写下划线转驼峰命名(考虑对象的深度递归情况)
 
@@ -642,3 +646,20 @@ for (let i = 1; i < arr.length; i++) {
 }
 console.log(result)
 ```
+#### 18. Array 构造函数只有一个参数值时的表现？
+```js
+生成的数组的长度为传入参数值
+let arr = new Array(5); // 调用 Array() 时可以使用或不使用 new。两者都会创建一个新的 Array 实例。
+arr.length === 5 //true
+```
+#### 19. ParseInt()和Number的区别
+```js
+parseInt可以解析类似12ad这样的前一段是有效的字符串，即从左向右解析，遇到字符串就停止
+而Number只能解析正确的数字字符串
+```
+#### 20. js脚本延迟加载的方式有哪些?
+```js
+  defer：异步加载，当文档解析完成后才会正式按照原先定义的顺序执行js文件
+  async：异步加载，但是文件一旦加载完成，便会立即执行，同时暂停文档解析
+```
+
