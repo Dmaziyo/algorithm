@@ -1,13 +1,15 @@
 ### 目录
 
-- [1. display:none 和 visibility:hidden 的区别](#1-display:none-和编译过程中，语法分析器的任务不包括（）
+- [目录](#目录)
+  - [1. display:none 和 visibility:hidden 的区别](#1-displaynone-和-visibilityhidden-的区别)
+  - [2. 什么是 scoped?](#2-什么是-scoped)
+  - [3. 常见的选择器有哪些?](#3-常见的选择器有哪些)
+  - [4. 介绍一下标准的 CSS 的盒子模型？低版本 IE 的盒子模型有什么不同的?](#4-介绍一下标准的-css-的盒子模型低版本-ie-的盒子模型有什么不同的)
+  - [5. link 和@import 区别?](#5-link-和import-区别)
+  - [6. position 有哪些属性](#6-position-有哪些属性)
+  - [7. 垂直居中的方法有哪些](#7-垂直居中的方法有哪些)
+  - [8. 实现两栏布局和三栏布局](#8-实现两栏布局和三栏布局)
 
-- [3. 常见的选择器有哪些?](#3-常见的选择器有哪些)
-- [4. 介绍一下标准的 CSS 的盒子模型？低版本 IE 的盒子模型有什么不同的?](#4-介绍一下标准的-css-的盒子模型低版本-ie-的盒子模型有什么不同的)
-- [5. link 和@import 区别?](#5-link-和import-区别)
-- [6. position 有哪些属性](#6-position-有哪些属性)
-- [7. 垂直居中的方法有哪些](#7-垂直居中的方法有哪些)
-- [8. 实现两栏布局和三栏布局](#8-实现两栏布局和三栏布局)
 
 #### 1. display:none 和 visibility:hidden 的区别
 
@@ -24,6 +26,7 @@
 [[带你理解 scoped、>>>、/deep/、::v-deep 的原理]](https://juejin.cn/post/7023343999909888037)[[你知道 Vue scoped 原理吗？这波你在第几层？]](https://juejin.cn/post/7098569051860893709)[[样式穿透]](https://juejin.cn/post/7083051766874374174#comment)
 
 ```js
+review times：√
 作用:只会作用于当前组件的样式,使得各组件之间的样式互不影响,实现了样式隔离
 实现原理:
     1.组件实例使用scoped的时候,会随机生成一段hash值
@@ -72,6 +75,7 @@ IE盒模型: width和height包含content, padding, border
 [[MDN position]](https://developer.mozilla.org/en-US/docs/Web/CSS/position)
 
 ```js
+review times：√
 - static:元素遵循正常的文本流布局
 - relative:元素在layout中的位置仍然是static的位置,但是可以基于自身进行偏移展示
 - absolute:元素脱离正常文本流,相对于最近的positioned的元素进行偏移布局展示
@@ -82,6 +86,7 @@ IE盒模型: width和height包含content, padding, border
 #### 7. 垂直居中的方法有哪些
 
 ```js
+review times：√
 // 方法一
 .className{
     position:absolute;
