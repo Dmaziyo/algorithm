@@ -21,6 +21,8 @@
   - [18. Array 构造函数只有一个参数值时的表现？](#18-array-构造函数只有一个参数值时的表现)
   - [19. ParseInt()和Number的区别](#19-parseint和number的区别)
   - [20. js脚本延迟加载的方式有哪些?](#20-js脚本延迟加载的方式有哪些)
+  - [21. javascript规定了几种语言类型](#21-javascript规定了几种语言类型)
+  - [22.模拟实现Symbol类型 【模拟实现symbol】](#22模拟实现symbol类型-模拟实现symbol)
 
 #### 1. 手写下划线转驼峰命名(考虑对象的深度递归情况)
 
@@ -663,3 +665,120 @@ parseInt可以解析类似12ad这样的前一段是有效的字符串，即从�
   async：异步加载，但是文件一旦加载完成，便会立即执行，同时暂停文档解析
 ```
 
+#### 21. javascript规定了几种语言类型
+```js
+ js可以分为原始数据类型和引用数据类型
+ 原始数据类型：undefined null boolean number string bigInt symbol，原始数据型的值存储在栈中，因为要频繁调用，所以方便在运行时直接找到
+ 引用数据类型：object array function  ，引用数据类型值存储在堆中，因为如果存储栈中会导致运行速度很慢，在栈中会存储引用数据类型值的地址
+Tips:
+  原始数据类型在复制的时候会重新开拓一个内存空间赋值，a=10 b=a;这时会在栈中新开拓一个空间进行赋值
+  引用数据类型的复制则会将地址进行复制，所以即使开辟了一个新的栈空间，但仍然指向同一个地址
+```
+#### 22.模拟实现Symbol类型 [【模拟实现symbol】](https://github.com/mqyqingfeng/Blog/issues/87)
+```js
+概述：Symbol是Es6引入的新的原始数据类型，表示独一无二的值，Symbol是一个函数，可以返回一个独一无二的"值"，而不是对象,不能使用new来创建
+手写一个Symbol可以加深Object的descriptor的了解，以及熟悉Object.prototype默认提供的方法
+特点：
+1.instanceof 结果为false
+  let s = Symbol('foo');
+  console.log(s instanceof Symbol)//false
+2.可以接受字符串或对象，打印的结果类似Symbol(转为字符串的结果)
+  const obj={
+    toString(){
+      return 'abc';
+    }
+  }
+3. 相同参数的symbol返回的值是不相等的
+    let s1 = Symbol('1')
+    let s2 = Symbol('1')
+    s1===s2 //false
+    作用：可以作为属性名存在，防止他人修改
+    let s = Symbol();
+    let a ={};
+    Object.defineProperty(a,s,{value:'hello'})
+    console.log(a[s])//只有在知道s的情况下才能获取到值
+
+4. Symbol作为属性名，不会出现在for in 中，也不会出现在Object.keys,Object.getOwnPropertyNames(类似于keys)，
+ 但是可以通过Object.getOwnPropertySymbols获取所有Symbol属性名
+6.可以使用Symbol.for来获取以相同传参得到的Symbol
+  s1= Symbol.for(1)
+  s2= Symbol.for(1)
+  s1 === s2 //true
+7.使用Symbol.keyFor可以查询一个已经登记(for生成的)Symbol是传入什么参数得到的
+  let s1 = Symbol.for(1)
+  let key =Symbol.keyFor(s1);
+  key === 1 
+
+实现功能  
+  var generateName = (function(){
+        var postfix = 0;
+        return function(descString){
+            postfix++;
+            return '@@' + descString + '_' + postfix
+        }
+    })()
+
+  function SymbolPolyFill(description){
+    1.不能使用new命令创建,因为new会将this的__proto__指向构造函数的prototype
+    if(this instanceof SymbolPolyFill)throw new TypeError('Symbol is not a constructor')
+
+
+    let descString = description === undefined ? undefined:String(description);
+    // 由于为了模仿出[[description]]属性，所以还需要创建一个对象
+    // 使得symbol instanceof !== SymbolPolyFill
+    let symbol = Object.create({
+      2.实现显示打印,打印的时候调用toString方法
+      toString:function(){
+        // 方案1
+        return `Symbol(${descString})`
+
+        // 方案2 避免String相同的情况
+        return this.__Name__;
+      }
+      3.symbol不能与任何其他类型进行运算,因为隐式类型转换会调用ValueOf,但是显示调用又不能报错，所以目前只能这么写
+      valueOf:function(){
+        return this;
+      }
+    });
+    Object.defineProperties(symbol,{
+      '__Description__':{
+        value:descString,
+          writable:false,
+          enumerable:false,
+          configurable:false
+      },
+      3.相同的Symbol函数返回值是不相等的（在不使用for的情况下）,为了防止作为属性重复。所以使用__Name__
+      '__Name__':{
+        value:descString,
+          writable:false,
+          enumerable:false,
+          configurable:false  
+      }
+    })
+    return symbol
+  }
+    // 实现函数记忆,当使用for方法的时候，会去寻找是否之前有使用过相同的description创造出的symbol
+    let forMap = {}
+    Object.defineProperties(SymbolPolyfill,{
+      'for':{
+        value:function(description){
+          let descString = description === undefined?undefined:string(description)
+          return forMap[descString]?forMap[descString]:forMap[descString] = SymbolPolyFill(description)
+        },
+        writable: true,
+        enumerable: false,
+        configurable: true
+      },
+      'keyFor':{
+        value：function(symbol){
+            for(let key in forMap){
+              if(forMap[key]===symbol)return key;
+            }
+        },
+        writable: true,
+        enumerable: false,
+        configurable: true
+      }
+    })
+
+```
