@@ -36,6 +36,11 @@
   - [33.如何解决跨域？](#33如何解决跨域)
   - [34.模块化开发怎么做？](#34模块化开发怎么做)
   - [35.请手写一个Promise.retry](#35请手写一个promiseretry)
+  - [36.谈一下对于Promise的理解](#36谈一下对于promise的理解)
+  - [37.什么是防抖和节流，为什么会出现？](#37什么是防抖和节流为什么会出现)
+  - [38.vue2和vue3的响应式的区别？](#38vue2和vue3的响应式的区别)
+  - [39.如何将扁平化的数组转换成树?](#39如何将扁平化的数组转换成树)
+  - [40.如何将多维数组扁平化](#40如何将多维数组扁平化)
 
 #### 1. 手写下划线转驼峰命名(考虑对象的深度递归情况)
 
@@ -944,4 +949,112 @@ Promise.retry(promise,1,1000).then((result)=>{
 }).catch(err=>{
   console.log(err)
 })
+```
+#### 36.谈一下对于Promise的理解
+```
+Promise本质是一个状态回调函数，当内部状态变更后，将获取到的值传给回调函数执行，并且then(successFn,failedFn)和catch(fn)都可以生成一个新的Promise2,而这个Promise2的状态是由前者的回调函数返回值决定的。当then中failedFn为空时，failedFn默认变成()=>reject(value),在Promise1执行reject的时候执行。即将当前状态和值穿透给promise2;。
+并且如果Promise处理返回的还是一个promise，则会将最终的内部promise处理的值取出来给下一个promise
+// promise什么时候执行，执行哪个回调函数，都是取决于状态。
+// 
+const fn = (s) => (
+  new Promise((resolve, reject) => {
+    if (typeof s === 'number') {
+      resolve();
+    } else {
+      reject();
+    }
+  })
+  .then(
+    res => console.log('参数是一个number'),
+    // 注意，这里没定义失败回调
+  )
+  .catch(err => console.log('参数是一个字符串'))
+)
+fn('1');
+fn(1);
+步骤分析：
+在加载第一个执行栈的时候
+1.首先执行reject(),此时promise状态变为了rejected，于是将failedFn压入微任务队列中，而此时又没有添加，所以压入的是()=>reject(value),即穿透给下一个promise
+2.在压入微任务队列后，同步执行fn(1),同理压入微任务队列中
+3.then()函数返回的Promise2执行catch时虽然是同步的，但是由于状态未知，只会手动push到cbFns中，所以微任务队列目前就两个
+4.执行微任务队列，由于第一个任务是穿透传值，此时promise2状态确立，执行failedFn，所以将catch的回调函数添加至微任务队列中。
+5.执行fn(1)传入的微任务，即打印number
+6.执行最后一个微任务，打印字符串
+```
+#### 37.什么是防抖和节流，为什么会出现？
+```
+防抖:一个事件在指定时间后触发，然后在指定时间内再次触发执行该事件，则清除先前的事件,重新计时执行。
+```
+#### 38.vue2和vue3的响应式的区别？
+```
+响应式：当代码中数据发生变更时，页面上的元素内容也随着数据改变
+vue2实现原理：利用了js中的defineProperty,将对象的属性进行注册监听,当数据修改时，同时操作DOM元素更改具体内容。
+Object.defineProperty(obj,prop,{
+    get(){
+      return this._prop
+    }
+    set(newVal){
+      this._prop = newVal;
+      //对于 dom元素进行修改
+      this.el.content =  newVal;
+    }
+})
+缺点：
+  1.所有的响应式数据只能在一开始就定义好，中途不能添加或删减属性，并且如果数据规模庞大，一开始就会很占据内存
+  2.并且无法监听数组的变换
+vue3实现原理：利用了ES6的新特性，proxy来实现代理
+let proxy2obj = new Proxy(obj,handler)
+优点：
+  1.不需要注册监听对象的属性,这样可以不用一开始注册监听所有数据，只需要传入对象，以及处理函数，相当于在具体修改对象前，就进行一个拦截,同时又实现了懒加载
+  2.对于数组的变化也可以监听
+```
+#### 39.如何将扁平化的数组转换成树?
+```js
+const list = [
+  { id: '1', name: '节点1' },
+  { id: '1_1', parentId: '1', name: '节点1-1' },
+  { id: '1_1_1', parentId: '1_1', name: '节点1-1-1' },
+  { id: '2', name: '节点2' },
+  { id: '2_1', parentId: '2', name: '节点2-1' },
+]
+// 将上述数组转换成下面这样
+[
+  { "id": "1", "name": "节点1",
+   "children": [{ "id": "1_1", "parentId": "1", "name": "节点1-1", 
+              "children": [{ "id": "1_1_1", "parentId": "1_1", "name": "节点1-1-1", "children": [] }] }] 
+  },
+  { "id": "2", "name": "节点2",
+   "children": [{ "id": "2_1", "parentId": "2", "name": "节点2-1",
+               "children": [] }] 
+  }
+]
+// 方法1：递归
+convert2Tree(list=[],parentId){
+  const arr = []
+  for(let item of list){
+    if(item.parentId===parentId){
+        arr.push({
+          ...item,
+          children:[convert2Tree(list,item.id)]
+        })
+    }
+  }
+  return arr;
+}
+```
+#### 40.如何将多维数组扁平化
+```js
+const arr = [1, [2, [3, 4, 5]]];
+function flatten(list){
+  const result = []
+  list.forEach((item)=>{
+    if(Array.isArray(item)){
+        result = [...result,...flatten(item)]
+    }
+    else{
+      result.push(item)
+    }
+  })
+  return result;
+}
 ```
