@@ -41,6 +41,13 @@
   - [38.vue2和vue3的响应式的区别？](#38vue2和vue3的响应式的区别)
   - [39.如何将扁平化的数组转换成树?](#39如何将扁平化的数组转换成树)
   - [40.如何将多维数组扁平化](#40如何将多维数组扁平化)
+  - [41.如何解释闭包](#41如何解释闭包)
+  - [42.请手写一个eventEmitter](#42请手写一个eventemitter)
+  - [43.浏览器有哪些存储数据的方式?](#43浏览器有哪些存储数据的方式)
+  - [44.mvvm和mvc的共同点和区别是什么？](#44mvvm和mvc的共同点和区别是什么)
+  - [45.进程和线程是什么？](#45进程和线程是什么)
+  - [46.不会改变原数组的方法有?](#46不会改变原数组的方法有)
+  - [47.v-if和v-show的区别？](#47v-if和v-show的区别)
 
 #### 1. 手写下划线转驼峰命名(考虑对象的深度递归情况)
 
@@ -368,7 +375,6 @@ undefined表示变量声明了但是未赋值
           }
           this.listData = arr
           this.screenHeight = window.screen.height
-          debugger
           this.visibleData = this.listData.slice(0, this.visibleCount)
         }
       })
@@ -982,8 +988,36 @@ fn(1);
 6.执行最后一个微任务，打印字符串
 ```
 #### 37.什么是防抖和节流，为什么会出现？
-```
-防抖:一个事件在指定时间后触发，然后在指定时间内再次触发执行该事件，则清除先前的事件,重新计时执行。
+```js
+防抖:目的是为了防止误触而导致事件多次触发,
+原理:当某个事件触发时，等待指定时间后执行相应回调函数，如果在等待时间内该事件再次触发，重新等待指定时间后再触发。
+// 具体方法
+function deBounce(fn,delay){
+    let timer = null;
+    return function(...args){
+      if(timer){
+        clearTimeout(timer);
+      }
+      timer = setTimeout(()=>{
+        fn.apply(this,args)
+        timer = null;
+      },delay)
+    }
+}
+节流:为了防止短时间内资源调用过多，所以在一定时间内进行了请求限制
+原理:在指定时间内反复调用相应函数，只会执行一次(当然次数也可以自己配置)
+function throttle(fn,period){
+    let date = 0;
+    return function(...args){
+      const curTime = Date.now()
+      if(curTime - date<=period){
+          return;
+      }
+        date = curTime;
+        fn.apply(this,args)
+    }
+}
+
 ```
 #### 38.vue2和vue3的响应式的区别？
 ```
@@ -1057,4 +1091,71 @@ function flatten(list){
   })
   return result;
 }
+```
+#### 41.如何解释闭包
+```js
+闭包:一个函数内部可以访问另外一个函数作用域下的变量，是利用了作用域链的原理
+作用域链:可以理解为是一个指向变量对象的数组，而变量对象为当前context和其所有上级context的变量对象,如果当前context的变量对象中没有找到相应变量，则会一直往上层变量对象寻找，直至到达全局context的变量对象
+```
+#### 42.请手写一个eventEmitter
+```js
+class EventEmitter{
+  constructor(){
+    this.tasks= {}
+  }
+  on(event,cb){
+    if(!this.tasks[event]){
+      this.tasks[event]=[]
+    }
+      this.tasks[event].push(cb)
+  }
+  off(event,cb){
+    if(this.tasks[event]){
+     this.tasks[event].filter(item=>item!==cb)
+    }
+  }
+  emit(event,...args){
+    if(this.tasks[event]){
+       this.tasks[event].forEach((item)=>item(...args))
+    }
+  }
+}
+```
+
+#### 43.浏览器有哪些存储数据的方式?
+[浏览器存储](https://juejin.cn/post/6974052211395887141?searchId=2023091210000865A2E889465844990299)
+```js
+1.cookies:存储在浏览器的轻量级文本文件,容量很小，通常用于存储一些用户验证信息，以及私人化定制广告。
+2.sessionStorage:以键值对的方式存储在浏览器当中，但是值只能是字符串,只作用当前窗口,不同窗口之间数据无法共享，并且关闭窗口数据就清空,刷新不会清除
+3.localStorage:与sessionStorage类似，但是会持久存储在浏览器中，并且在同源的窗口和页面下共享数据
+4.indexedDB:可以存储大型数据在浏览器中，是一种键值对的数据库，值可以是对象.
+```
+#### 44.mvvm和mvc的共同点和区别是什么？
+```js
+共同点：将一个项目所需完成的各种业务逻辑进行分离出来，各个模块独自开发互不影响。降低耦合度.
+区别：
+- mvc中model层和view层之间的交互是通过中间的controller来进行实现的，也就是需要一个代理操作。二者本质互不影响。只是因为controller的加入看起来有关联
+- mvvm中的model和view层之间也是通过一个中间人viewModel来进行交互，但是viewModel只是负责将model和view通过发布订阅者模式来进行数据的双向绑定
+可以说是手动挡和自动挡的区别了
+```
+#### 45.进程和线程是什么？
+```js
+进程：
+ - 进程是一个文件的执行，当从硬盘读取加载到内存执行时，就拥有了一个进程。
+ - 进程之间互不干扰，如果一个进程崩溃了，另外一个进程仍然能够运行。
+线程：
+ -线程是文件的的局部代码执行片段，线程是进程内的最小执行单元,进程可以是线程的集合。
+ -线程有内部自己地址和存储器，但同时可以访问进程提供的公共资源。
+ -线程一旦崩溃，整个进程就会崩溃，进程中的其他线程也就跟着崩溃。
+```
+#### 46.不会改变原数组的方法有?
+```js
+filter,map,flat,concat,slice
+```
+#### 47.v-if和v-show的区别？
+```js
+共同点:v-if和v-show都是使元素从页面中消失。
+不同点:
+  原理：v-if是将元素从DOM中移除，并且会触发vue的生命周期，而v-show是将元素的css属性display设置为none
+  应用场景：v-if是懒加载，如果一开始不需要的话可以节省性能，v-show适用于条件变化比较频繁的情况。
 ```
